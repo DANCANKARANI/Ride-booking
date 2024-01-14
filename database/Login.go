@@ -61,7 +61,7 @@ func Login(c *fiber.Ctx){
 				fmt.Println(Token)
 				fmt.Println(Customers.ID)
 				
-				//c.Send("Logged in successfully")
+				c.Send("Logged in successfully")
 				
 				break			
 			}	

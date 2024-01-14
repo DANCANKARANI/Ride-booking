@@ -6,10 +6,13 @@ import (
 
 	"github.com/gofiber/fiber"
 	"github.com/golang-jwt/jwt"
+	
 )
+var secretkey="secretkey"
+
 
 func GenerateJWT(c *fiber.Ctx, user_id uint64)(string,error){
-	secretkey := "secretkey"
+	
 	var mySigningKey = []byte(secretkey)
 	token := jwt.New(jwt.SigningMethodHS256)
 	//claims := token.Claims.(jwt.MapClaims)
@@ -54,4 +57,27 @@ func ExtractClaims(c *fiber.Ctx,tokenString string)(int,error){
 		}
 	}
 	return 0, err
+}
+
+
+func ValidateJWT(c *fiber.Ctx,tokenString string) bool {
+    // Define the secret key used to sign the JWT
+    secretKey := []byte(secretkey)
+
+    // Parse the token with the secret key
+    token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+        // Verify the signing method
+        if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+            return nil, c.JSON("Unexpected signing method")
+        }
+        return secretKey, nil
+    })
+
+    if err != nil || !token.Valid {
+        return false
+    }
+
+    // Additional custom checks can be performed here, e.g., checking claims
+
+    return true
 }

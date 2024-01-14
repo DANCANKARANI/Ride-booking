@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penta Drive</title>
+    <style>
+        body {
+            
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column; /* Updated to column */
+            height: 100vh;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        .top-header {
+            color: rgb(0, 255, 179);
+            margin-bottom: 100px; /* Add margin to separate from the form */
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            font-style: italic;
+        }
+
+        form {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        div {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-header">
+        <h1>PENTA@DRIVE</h1>
+    </div>
+    <div>
+        <form action="http://localhost:8080/signup" method="POST">
+            <label for="email">Username</label>
+            <input type="text" id="email" name="email">
+            <br>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password">
+            <br>
+            <label for="firstname">firstname</label>
+            <input type="text" id="firstname" name="firstname">
+            <label for="phone">phone</label>
+            <input type="text" id="phone" name="phone">
+            <br>
+            <button type="submit">Sign Up</button>
+            <button type="button"><a href="index.html">login</a></button>
+        </form>
+    </div>
+</body>
+</html>

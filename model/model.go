@@ -7,7 +7,7 @@ type Customers struct {
 	FirstName 	string 	`json:"firstname"`
 	LastName  	string	`json:"lastname"`
 	UserName	string	`json:"username"`
-	Location	string	`json:"location"`
+	PhoneNumber	string	`json:"phone_number"`
 	Password	string	`json:"password"`
 }
 type Driver struct{
@@ -15,7 +15,9 @@ type Driver struct{
 	FirstName 	string	`json:"firstname"`
 	Lastname 	string	`json:"lastname"`
 	UserName	string	`json:"username"`
+	PhoneNumber	string	`json:"phone_number"`
 	Password 	string	`json:"password"`
+	Location	string	`json:"location"`
 	
 }
 type Cars struct{

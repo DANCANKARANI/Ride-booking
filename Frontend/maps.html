@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penta Drive</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    <style>
+     #map {
+            height: 400px;
+    }
+    #search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;        
+    }
+    .search label{
+        flex: 1;
+        margin-right: 10px;
+    }
+    label {
+    margin-bottom: 5px;
+    }
+
+    input {
+            display: inline-flex;
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            
+    }
+
+button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: auto;
+    display: block;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+.container{
+    display:flex;
+    align-items: center;
+    
+}
+.container img{
+    width: 100px;
+    height: 50px;
+    margin-right: 10px;
+}
+.payment-container{
+    display: flex;
+}
+.payment-container label{
+    margin-top: 10px;
+}
+    </style>
+</head>
+<!--The beginning of  the start and destinition search-->
+<body>
+<div id="map"></div>
+<div id="search-bar" class="search">
+    <label for="start">Start Location:</label>
+    <input type="text" id="start" placeholder="Enter start location" autocomplete="on">
+    <label for="destination">Destination Location:</label>
+    <input type="text" id="destination" placeholder="Enter destination location" autocomplete="on">
+    <button onclick="addMarkerAndDirections()">Get Directions</button>
+    <input type="text" name="" id="distance" readonly placeholder="Total cost: ksh 300">
+    <div class="container">
+        <img src="mpesa.jpeg" alt="m-pesa icon">
+        <label for="payment">Lipa Na M-PESA</label>
+    </div>
+    <div class="payment-container">
+        <label for="phone">Phone Number</label>
+        <input type="text" placeholder="eg +254 797 408 042" name="phone">
+    </div>
+    <button type="submit">Lipa </button>
+</div>
+<!--The map Library for directions-->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script>
+    var map = L.map('map').setView([-1.286389, 36.817223], 13);  // Default Nairobi coordinates
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var control = L.Routing.control({
+        waypoints: [],
+        routeWhileDragging: true
+    }).addTo(map);
+
+    L.Control.geocoder().addTo(map);
+
+    function getDeviceLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var latlng = [position.coords.latitude, position.coords.longitude];
+                    map.setView(latlng, 13);
+
+                    // Optionally, update the start input with the current location
+                    document.getElementById('start').value = latlng.join(', ');
+                },
+                function(error) {
+                    console.error('Error getting device location:', error);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by your browser.');
+        }
+    }
+
+    function addMarkerAndDirections() {
+        var startInput = document.getElementById('start').value;
+        var destinationInput = document.getElementById('destination').value;
+
+        if (destinationInput) {
+            // Clear existing markers and directions
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            // Geocode start and destination
+            geocodeAddress(startInput, function(startLatLng) {
+                geocodeAddress(destinationInput, function(destinationLatLng) {
+                    // Add marker for start
+                    var startMarker = L.marker(startLatLng, { draggable: true }).addTo(map);
+                    startMarker.bindPopup("<b>Start</b><br>" + startInput).openPopup();
+
+                    // Add marker for destination
+                    var destinationMarker = L.marker(destinationLatLng).addTo(map);
+                    destinationMarker.bindPopup("<b>Destination</b><br>" + destinationInput).openPopup();
+
+                    // Zoom and pan to fit all markers
+                    var bounds = L.latLngBounds(startMarker.getLatLng(), destinationMarker.getLatLng());
+                    map.fitBounds(bounds);
+
+                    // Set waypoints for routing
+                    control.setWaypoints([
+                        startMarker.getLatLng(),
+                        destinationMarker.getLatLng()
+                    ]);
+
+                    // Update the start input with the marker's coordinates when dragged
+                    startMarker.on('dragend', function(event) {
+                        var marker = event.target;
+                        document.getElementById('start').value = marker.getLatLng().lat + ', ' + marker.getLatLng().lng;
+                    });
+                      // Get the route information
+                  
+
+                });
+            });
+        }
+    }
+
+    function geocodeAddress(address, callback) {
+    fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(address))
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0 && data[0].lat && data[0].lon) {
+                callback([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+            } else {
+                console.error('Geocoding data is missing or invalid:', data);
+                // You might want to handle this error case, e.g., display a message to the user
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching geocoding data:', error);
+            // You might want to handle this error case, e.g., display a message to the user
+        });
+}
+
+          
+        
+</script>
+
+</body>
+</html>

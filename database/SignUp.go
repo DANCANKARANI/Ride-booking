@@ -11,7 +11,6 @@ type Client struct{
 	FirstName	string	`json:"firstname"`
 	LastName	string	`json:"lastname"`
 	UserName 	string	`json:"username"`
-	Location 	string	`json:"location"`
 }
 
 //hashing the password
@@ -27,7 +26,7 @@ func HashAndSalt(c *fiber.Ctx, password string) (string, error) {
 func CreateUserAccount(c *fiber.Ctx){
 	Customers:=model.Customers{}
 	if err:=c.BodyParser(&Customers);err!=nil{
-		panic(err)
+		c.Send(err.Error())
 	}
 	db:=ConnectDB()
 	defer db.Close()
@@ -41,7 +40,7 @@ func CreateUserAccount(c *fiber.Ctx){
 		FirstName: Customers.FirstName,
 		LastName: Customers.LastName,
 		UserName: Customers.UserName,
-		Location: Customers.Location,
+		PhoneNumber: Customers.PhoneNumber,
 		Password: hashedpassword,
 	})
 	//calling response user function
@@ -52,11 +51,8 @@ func ResponseUser(c *fiber.Ctx, response model.Customers)Client{
 	Response:=Client{
 		FirstName: response.FirstName,
 		LastName: response.LastName,
-		Location: response.Location,
 		UserName: response.UserName,
 	}
 	return Response
 }
-	
-
 	
