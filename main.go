@@ -1,4 +1,4 @@
-/*package main
+package main
 
 import (
 	
@@ -28,9 +28,9 @@ func main() {
 }
 func HelloWorld(c *fiber.Ctx){
 	c.Send("Hello Dancan")
-}*/
+}
 
-package main
+/*package main
 
 import (
 	"bytes"
@@ -96,3 +96,4 @@ func main() {
 	//printin the result from the body
 	fmt.Println(string(body))
 }
+*/
